@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>We10x Login Page</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --brand: #6366f1;
+      --brand-2: #22d3ee;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --error: #dc2626;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      color: var(--text);
+    }
+
+    /* ---------- Left: brand panel ---------- */
+    .brand {
+      background:
+        radial-gradient(600px 400px at 15% 10%, rgba(99,102,241,.45), transparent 60%),
+        radial-gradient(500px 400px at 90% 90%, rgba(34,211,238,.30), transparent 60%),
+        var(--bg);
+      color: #fff;
+      padding: 48px 56px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .logo { display: flex; align-items: center; gap: 12px; }
+    .logo svg { width: 48px; height: 48px; }
+    .logo-text { font-size: 28px; font-weight: 800; letter-spacing: -.5px; }
+    .logo-text span {
+      background: linear-gradient(90deg, var(--brand), var(--brand-2));
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .quote h2 {
+      font-size: clamp(30px, 3.6vw, 46px);
+      line-height: 1.15;
+      font-weight: 800;
+      letter-spacing: -1px;
+    }
+    .quote h2 em {
+      font-style: normal;
+      background: linear-gradient(90deg, var(--brand-2), #a5b4fc);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .quote p { margin-top: 16px; color: #94a3b8; font-size: 16px; max-width: 420px; }
+    .foot { color: #64748b; font-size: 13px; }
+
+    /* ---------- Right: form ---------- */
+    .panel {
+      display: flex; align-items: center; justify-content: center;
+      padding: 32px; background: #fff;
+    }
+    .card { width: 100%; max-width: 380px; }
+    .card h1 { font-size: 28px; font-weight: 800; letter-spacing: -.5px; }
+    .card .sub { color: var(--muted); margin: 6px 0 28px; font-size: 15px; }
+
+    .field { margin-bottom: 18px; }
+    label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+    .input-wrap { position: relative; }
+    input[type="email"], input[type="password"], input[type="text"] {
+      width: 100%; padding: 12px 14px;
+      border: 1.5px solid var(--border); border-radius: 10px;
+      font-size: 15px; outline: none; transition: .2s;
+    }
+    input:focus { border-color: var(--brand); box-shadow: 0 0 0 4px rgba(99,102,241,.15); }
+    .field.invalid input { border-color: var(--error); }
+    .err { color: var(--error); font-size: 12px; margin-top: 5px; display: none; }
+    .field.invalid .err { display: block; }
+    .toggle {
+      position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; color: var(--muted);
+      font-size: 13px; font-weight: 600; cursor: pointer;
+    }
+
+    .row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; font-size: 14px; }
+    .row label { display: flex; align-items: center; gap: 8px; margin: 0; font-weight: 500; color: var(--muted); }
+    .row a, .signup a { color: var(--brand); text-decoration: none; font-weight: 600; }
+    .row a:hover, .signup a:hover { text-decoration: underline; }
+
+    button.submit {
+      width: 100%; padding: 13px; border: none; border-radius: 10px; cursor: pointer;
+      font-size: 16px; font-weight: 700; color: #fff;
+      background: linear-gradient(90deg, var(--brand), #4f46e5);
+      box-shadow: 0 8px 20px rgba(99,102,241,.35);
+      transition: transform .15s, box-shadow .15s;
+    }
+    button.submit:hover { transform: translateY(-1px); box-shadow: 0 12px 24px rgba(99,102,241,.4); }
+    .signup { text-align: center; margin-top: 22px; font-size: 14px; color: var(--muted); }
+    .msg { margin-top: 14px; text-align: center; font-size: 14px; color: #16a34a; display: none; }
+
+    .captcha-box { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .captcha-box canvas { border: 1.5px solid var(--border); border-radius: 10px; background: #f1f5f9; user-select: none; }
+    .refresh {
+      width: 42px; height: 42px; border-radius: 10px; cursor: pointer;
+      border: 1.5px solid var(--border); background: #fff; color: var(--brand);
+      font-size: 20px; line-height: 1; transition: .2s;
+    }
+    .refresh:hover { background: #eef2ff; border-color: var(--brand); }
+
+    @media (max-width: 860px) {
+      body { grid-template-columns: 1fr; }
+      .brand { padding: 28px 24px; gap: 28px; }
+      .foot { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Left: logo + quote -->
+  <section class="brand">
+    <div class="logo">
+      <!-- Logo: 3 connected nodes = a team, together -->
+      <svg viewBox="0 0 48 48" fill="none" aria-label="We10x logo">
+        <defs>
+          <linearGradient id="g" x1="0" y1="0" x2="48" y2="48">
+            <stop offset="0" stop-color="#6366f1"/>
+            <stop offset="1" stop-color="#22d3ee"/>
+          </linearGradient>
+        </defs>
+        <path d="M24 9 L9 37 M24 9 L39 37 M9 37 H39" stroke="url(#g)" stroke-width="3" stroke-linejoin="round"/>
+        <circle cx="24" cy="9" r="6" fill="url(#g)"/>
+        <circle cx="9" cy="37" r="6" fill="url(#g)"/>
+        <circle cx="39" cy="37" r="6" fill="url(#g)"/>
+      </svg>
+      <div class="logo-text">We<span>10x</span></div>
+    </div>
+
+    <div class="quote">
+      <h2>Alone we go fast,<br><em>together we go 10x.</em></h2>
+      <p>Great things are never built by one person. Log in, join your team, and multiply your productivity.</p>
+    </div>
+
+    <div class="foot">© 2026 We10x. Work together. Grow 10x.</div>
+  </section>
+
+  <!-- Right: login form -->
+  <section class="panel">
+    <div class="card">
+      <h1>Welcome back 👋</h1>
+      <p class="sub">Log in to continue working with your team.</p>
+
+      <form id="loginForm" method="post" action="#" novalidate>
+        <div class="field" id="usernameField">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" placeholder="Enter your username" autocomplete="username" required>
+          <div class="err">Please enter your username (min 3 characters).</div>
+        </div>
+
+        <div class="field" id="passField">
+          <label for="password">Password</label>
+          <div class="input-wrap">
+            <input type="password" id="password" name="password" placeholder="Enter your password" autocomplete="current-password" required>
+            <button type="button" class="toggle" id="toggle">Show</button>
+          </div>
+          <div class="err">Password must be at least 6 characters.</div>
+        </div>
+
+        <div class="row">
+          <label><input type="checkbox" name="remember"> Remember me</label>
+          <a href="#">Forgot password?</a>
+        </div>
+
+        <div class="field" id="captchaField">
+          <label for="captcha">Verification</label>
+          <div class="captcha-box">
+            <canvas id="captchaCanvas" width="160" height="50"></canvas>
+            <button type="button" class="refresh" id="captchaRefresh" title="Refresh captcha" aria-label="Refresh captcha">&#8635;</button>
+          </div>
+          <input type="text" id="captcha" name="captcha" placeholder="Enter the code above" autocomplete="off" maxlength="5">
+          <div class="err">Captcha does not match. Please try again.</div>
+        </div>
+
+        <button type="submit" class="submit">Log in</button>
+        <div class="msg" id="msg">Login successful ✅</div>
+      </form>
+
+    </div>
+  </section>
+
+  <script>
+    const form = document.getElementById('loginForm');
+    const username = document.getElementById('username');
+    const pass = document.getElementById('password');
+    const toggle = document.getElementById('toggle');
+    const msg = document.getElementById('msg');
+
+    // ---------- Captcha ----------
+    const capCanvas = document.getElementById('captchaCanvas');
+    const capInput = document.getElementById('captcha');
+    let capCode = '';
+    const rnd = (n) => Math.floor(Math.random() * n);
+
+    function newCaptcha() {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no confusing 0/O/1/I
+      capCode = Array.from({ length: 5 }, () => chars[rnd(chars.length)]).join('');
+      const c = capCanvas.getContext('2d');
+      c.clearRect(0, 0, capCanvas.width, capCanvas.height);
+      c.fillStyle = '#f1f5f9';
+      c.fillRect(0, 0, capCanvas.width, capCanvas.height);
+      for (let i = 0; i < 6; i++) {            // noise lines
+        c.strokeStyle = `hsl(${rnd(360)},60%,65%)`;
+        c.lineWidth = 1.5;
+        c.beginPath();
+        c.moveTo(rnd(160), rnd(50));
+        c.lineTo(rnd(160), rnd(50));
+        c.stroke();
+      }
+      c.font = 'bold 28px "Segoe UI", sans-serif';
+      c.textBaseline = 'middle';
+      c.textAlign = 'center';
+      [...capCode].forEach((ch, i) => {        // distorted characters
+        c.save();
+        c.translate(22 + i * 29, 26 + rnd(8) - 4);
+        c.rotate((Math.random() - 0.5) * 0.6);
+        c.fillStyle = `hsl(${230 + rnd(60)},60%,35%)`;
+        c.fillText(ch, 0, 0);
+        c.restore();
+      });
+      for (let i = 0; i < 40; i++) {           // noise dots
+        c.fillStyle = `hsla(${rnd(360)},50%,50%,.5)`;
+        c.fillRect(rnd(160), rnd(50), 2, 2);
+      }
+      capInput.value = '';
+    }
+    document.getElementById('captchaRefresh').addEventListener('click', newCaptcha);
+    newCaptcha();
+
+    toggle.addEventListener('click', () => {
+      const show = pass.type === 'password';
+      pass.type = show ? 'text' : 'password';
+      toggle.textContent = show ? 'Hide' : 'Show';
+    });
+
+   form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const userOk = username.value.trim().length >= 3;
+  const passOk = pass.value.length >= 6;
+  const capOk = capInput.value.trim().toUpperCase() === capCode;
+  document.getElementById('usernameField').classList.toggle('invalid', !userOk);
+  document.getElementById('passField').classList.toggle('invalid', !passOk);
+  document.getElementById('captchaField').classList.toggle('invalid', !capOk);
+
+  if (!capOk) newCaptcha();
+  if (!(userOk && passOk && capOk)) { msg.style.display = 'none'; return; }
+
+  try {
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: username.value.trim(), password: pass.value })
+    });
+    const data = await res.json();
+
+    if (res.ok) {
+      localStorage.setItem('token', data.token);
+      msg.style.color = '#16a34a';
+      msg.textContent = 'Login successful ✅';
+      // next step: window.location.href = '/dashboard.html';
+    } else {
+      msg.style.color = '#dc2626';
+      msg.textContent = data.message || 'Login failed';
+      newCaptcha();
+    }
+  } catch {
+    msg.style.color = '#dc2626';
+    msg.textContent = 'Server se connect nahi ho paya';
+  }
+  msg.style.display = 'block';
+});
+  </script>
+</body>
+</html>
