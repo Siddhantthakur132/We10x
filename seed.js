@@ -3,9 +3,8 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const User = require('./models/User');
 
-// Apne 5 users yahan daalo (password min 6 chars, kyunki frontend validation hai)
 const users = [
-  { username: 'user1', password: 'pass123' },
+  { username: 'validuser', password: 'Test@123' },
   { username: 'user2', password: 'pass456' },
   { username: 'user3', password: 'pass789' },
   { username: 'user4', password: 'pass012' },
@@ -14,13 +13,10 @@ const users = [
 
 (async () => {
   await mongoose.connect(process.env.MONGO_URI);
+  await User.deleteMany({}); // purane user1..5 hat jaayenge, sirf ye 5 rahenge
   for (const u of users) {
     const hash = await bcrypt.hash(u.password, 10);
-    await User.updateOne(
-      { username: u.username.toLowerCase() },
-      { $set: { password: hash } },
-      { upsert: true }
-    );
+    await User.create({ username: u.username.toLowerCase(), password: hash });
   }
   console.log('5 users seeded ✅');
   process.exit(0);

@@ -156,7 +156,7 @@
         <div class="field" id="usernameField">
           <label for="username">Username</label>
           <input type="text" id="username" name="username" placeholder="Enter your username" autocomplete="username" required>
-          <div class="err">Please enter your username (min 3 characters).</div>
+          <div class="err">Username min 3 characters.</div>
         </div>
 
         <div class="field" id="passField">
@@ -165,7 +165,7 @@
             <input type="password" id="password" name="password" placeholder="Enter your password" autocomplete="current-password" required>
             <button type="button" class="toggle" id="toggle">Show</button>
           </div>
-          <div class="err">Password must be at least 6 characters.</div>
+          <div class="err">Password min 6 characters.</div>
         </div>
 
         <div class="row">
@@ -238,48 +238,50 @@
     document.getElementById('captchaRefresh').addEventListener('click', newCaptcha);
     newCaptcha();
 
+    // ---------- Show / Hide password ----------
     toggle.addEventListener('click', () => {
       const show = pass.type === 'password';
       pass.type = show ? 'text' : 'password';
       toggle.textContent = show ? 'Hide' : 'Show';
     });
 
-   form.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const userOk = username.value.trim().length >= 3;
-  const passOk = pass.value.length >= 6;
-  const capOk = capInput.value.trim().toUpperCase() === capCode;
-  document.getElementById('usernameField').classList.toggle('invalid', !userOk);
-  document.getElementById('passField').classList.toggle('invalid', !passOk);
-  document.getElementById('captchaField').classList.toggle('invalid', !capOk);
+    // ---------- Submit ----------
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const userOk = username.value.trim().length >= 3;
+      const passOk = pass.value.length >= 6;
+      const capOk = capInput.value.trim().toUpperCase() === capCode;
+      document.getElementById('usernameField').classList.toggle('invalid', !userOk);
+      document.getElementById('passField').classList.toggle('invalid', !passOk);
+      document.getElementById('captchaField').classList.toggle('invalid', !capOk);
 
-  if (!capOk) newCaptcha();
-  if (!(userOk && passOk && capOk)) { msg.style.display = 'none'; return; }
+      if (!capOk) newCaptcha();
+      if (!(userOk && passOk && capOk)) { msg.style.display = 'none'; return; }
 
-  try {
-    const res = await fetch('/api/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: username.value.trim(), password: pass.value })
+      try {
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: username.value.trim(), password: pass.value })
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          localStorage.setItem('token', data.token);
+          msg.style.color = '#16a34a';
+          msg.textContent = 'Login successful ✅';
+          // next step: window.location.href = '/dashboard.html';
+        } else {
+          msg.style.color = '#dc2626';
+          msg.textContent = data.message || 'Login failed';
+          newCaptcha();
+        }
+      } catch {
+        msg.style.color = '#dc2626';
+        msg.textContent = 'Server se connect nahi ho paya';
+      }
+      msg.style.display = 'block';
     });
-    const data = await res.json();
-
-    if (res.ok) {
-      localStorage.setItem('token', data.token);
-      msg.style.color = '#16a34a';
-      msg.textContent = 'Login successful ✅';
-      // next step: window.location.href = '/dashboard.html';
-    } else {
-      msg.style.color = '#dc2626';
-      msg.textContent = data.message || 'Login failed';
-      newCaptcha();
-    }
-  } catch {
-    msg.style.color = '#dc2626';
-    msg.textContent = 'Server se connect nahi ho paya';
-  }
-  msg.style.display = 'block';
-});
   </script>
 </body>
 </html>
